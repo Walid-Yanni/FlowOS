@@ -15,7 +15,6 @@
                 <h1>FlowOS</h1>
             </div>
             <ul class="nav-links">
-                <li><a href="#">Tableau de bord</a></li>
                 <li><a href="#" class="active">Tâches</a></li>
                 <li><a href="#">Projets</a></li>
             </ul>
@@ -25,6 +24,7 @@
         </nav>
 
         <main id="app">
+            
             <div class="dashboard-stats">
                 <div class="stat-card">
                     <span class="stat-label">Progression</span>
@@ -40,12 +40,11 @@
             </div>  
 
             <section id="tasks-section">
-                
                 <div class="header-flex">
-    <h2>Mes Tâches</h2>
-    <button id="focus-mode-btn" class="btn-focus">🎯 Mode Focus</button>
-</div>
-                <p>Gère tes priorités pour la journée.</p>
+                    <h2>Mes Tâches</h2>
+                    <button id="focus-mode-btn" class="btn-focus">🎯 Mode Focus</button>
+                </div>
+                
                 <form id="todo-form">
                     <input type="text" id="task-input" placeholder="Ajouter une tâche..." required>
                     <select id="category-input">
@@ -65,12 +64,14 @@
 
                 <div class="task-controls">
                     <div class="task-stats">
-                        Il reste <span id="task-count">0</span> tâche(s).
-                        <button id="clear-completed" class="btn-secondary">Nettoyer terminées 🧹</button>
+                        <span>Il reste <span id="task-count">0</span> tâche(s).</span>
+                        <button id="clear-completed">Nettoyer terminées 🧹</button>
                     </div>
+
                     <div class="search-container">
-                        <input type="text" id="search-input" placeholder="Rechercher...">
+                        <input type="text" id="search-input" placeholder="Rechercher une tâche...">
                     </div>
+
                     <div class="filters">
                         <button class="filter-btn active" data-filter="all">Toutes</button>
                         <button class="filter-btn" data-filter="CCNA">CCNA</button>
@@ -78,10 +79,12 @@
                         <button class="filter-btn" data-filter="Perso">Perso</button>
                     </div>
                 </div>
+
                 <ul id="task-list"></ul>
             </section>
         </main>
     </div>
+
     <script type="module" src="app/app.js"></script>
 </body>
 </html>

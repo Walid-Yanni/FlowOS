@@ -1,41 +1,61 @@
+// --- LE MAGASIN DE DONNÉES (STORE) ---
+// Ce fichier sert à gérer la liste des tâches (ajouter, supprimer, sauvegarder)
+
 const store = {
+    // 1. L'état actuel de nos données (notre tableau de tâches)
     state: {
         tasks: []
     },
 
+    // 2. Initialisation : On récupère ce qui est stocké dans le navigateur au démarrage
     init() {
-        const saved = localStorage.getItem('flowos_tasks');
-        if (saved) {
-            this.state.tasks = JSON.parse(saved);
+        const donneesSauvegardees = localStorage.getItem('flowos_tasks');
+        
+        if (donneesSauvegardees) {
+            // On transforme le texte JSON en véritable tableau JavaScript
+            this.state.tasks = JSON.parse(donneesSauvegardees);
+        } else {
+            // Si rien n'est stocké, on commence avec une liste vide
+            this.state.tasks = [];
         }
     },
 
+    // 3. Sauvegarde : On enregistre le tableau actuel dans le navigateur
     save() {
-        localStorage.setItem('flowos_tasks', JSON.stringify(this.state.tasks));
+        // On transforme le tableau en texte (JSON) pour que le navigateur puisse le garder
+        const texteAEnregistrer = JSON.stringify(this.state.tasks);
+        localStorage.setItem('flowos_tasks', texteAEnregistrer);
     },
 
-    addTask(text, category, priority, dueDate) {
-    const newTask = {
-        id: Date.now(),
-        text: text,
-        category: category || "Général",
-        priority: parseInt(priority),
-        dueDate: dueDate || null, // On stocke la date
-        completed: false
-    };
-    this.state.tasks.push(newTask);
-    this.save();
-},
+    // 4. Ajouter une tâche
+    addTask(contenu, categorie, niveauPriorite, dateEcheance) {
+        const nouvelleTache = {
+            id: Date.now(), // On génère un identifiant unique avec l'heure actuelle
+            text: contenu,
+            category: categorie || "Général",
+            priority: parseInt(niveauPriorite), // On s'assure que c'est un nombre
+            dueDate: dateEcheance || null,
+            completed: false // Par défaut, une tâche n'est pas terminée
+        };
 
-    deleteTask(id) {
-        this.state.tasks = this.state.tasks.filter(t => t.id !== id);
+        this.state.tasks.push(nouvelleTache); // On l'ajoute au tableau
+        this.save(); // On enregistre tout de suite
+    },
+
+    // 5. Supprimer une tâche
+    deleteTask(idTache) {
+        // On ne garde que les tâches qui n'ont PAS l'ID qu'on veut supprimer
+        this.state.tasks = this.state.tasks.filter(t => t.id !== idTache);
         this.save();
     },
 
+    // 6. Nettoyer (supprimer toutes les tâches terminées)
     clearCompleted() {
-        this.state.tasks = this.state.tasks.filter(t => !t.completed);
+        // On ne garde que les tâches qui ne sont pas finies (completed === false)
+        this.state.tasks = this.state.tasks.filter(t => t.completed === false);
         this.save();
     }
 };
 
+// On exporte le store pour l'utiliser dans app.js
 export default store;

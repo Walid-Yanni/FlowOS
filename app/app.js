@@ -1,205 +1,155 @@
 import store from './store.js';
 
+// --- INITIALISATION ---
 store.init();
-let currentSearch = "";
+let rechercheEnCours = ""; // Plus clair que currentSearch
+let filtreActuel = localStorage.getItem('activeFilter') || 'all';
 
-// --- FONCTIONS GLOBALES ---
+// --- FONCTIONS POUR LES TACHES (Action sur les données) ---
+
+// Inverser l'état (Fait / À faire)
 window.toggleTask = (id) => {
-    const task = store.state.tasks.find(t => t.id === id);
-    if (task) {
-        task.completed = !task.completed;
-        store.save();
-        renderTasks();
+    const laTache = store.state.tasks.find(t => t.id === id);
+    if (laTache) {
+        laTache.completed = !laTache.completed;
+        store.save(); // On enregistre
+        renderTasks(); // On rafraîchit l'affichage
     }
 };
 
+// Supprimer une tâche
 window.deleteTask = (id) => {
     store.deleteTask(id);
     renderTasks();
 };
 
-// --- RENDU ---
-function renderTasks(filter = localStorage.getItem('activeFilter') || 'all') {
-    const list = document.getElementById('task-list');
-    if (!list) return;
+// --- LE RENDU (Affichage sur l'écran) ---
 
-    list.innerHTML = '';
-    const allTasks = store.state.tasks; 
+function renderTasks() {
+    const listeUl = document.getElementById('task-list');
+    if (!listeUl) return;
 
-    const filteredTasks = allTasks.filter(t => {
-        const matchesCategory = filter === 'all' || t.category.toLowerCase() === filter.toLowerCase();
-        const taskText = (t.text || "").toLowerCase();
-        return matchesCategory && taskText.includes(currentSearch.toLowerCase());
-    }).sort((a, b) => {
-        // 1. On trie d'abord par statut (les non-terminées en premier)
-        if (a.completed !== b.completed) {
-            return a.completed ? 1 : -1;
-        }
-        // 2. Puis par priorité (de 3 à 1)
+    listeUl.innerHTML = ''; // On vide la liste avant de la reconstruire
+    const toutesLesTaches = store.state.tasks; 
+
+    // 1. On filtre les tâches selon la catégorie ET la recherche
+    const tachesFiltrees = toutesLesTaches.filter(t => {
+        // Est-ce que la catégorie correspond ?
+        const correspondCategorie = (filtreActuel === 'all') || (t.category.toLowerCase() === filtreActuel.toLowerCase());
+        
+        // Est-ce que le texte contient ce qu'on cherche ?
+        const correspondRecherche = t.text.toLowerCase().includes(rechercheEnCours.toLowerCase());
+
+        return correspondCategorie && correspondRecherche;
+    });
+
+    // 2. On trie : Les non-terminées en haut, et par priorité (3=Haut, 1=Bas)
+    tachesFiltrees.sort((a, b) => {
+        if (a.completed !== b.completed) return a.completed ? 1 : -1;
         return b.priority - a.priority;
     });
-    filteredTasks.forEach(task => {
+
+    // 3. On crée le HTML pour chaque tâche
+    tachesFiltrees.forEach(task => {
         const li = document.createElement('li');
-        const priorityClass = task.priority == 3 ? 'prio-high' : task.priority == 1 ? 'prio-low' : 'prio-med';
-        const categoryClass = (task.category || 'général').toLowerCase();
-        const dueDateHtml = task.dueDate ? `<span class="due-date ${isOverdue(task.dueDate) ? 'overdue' : ''}">📅 ${formatDate(task.dueDate)}</span>` : '';
         
-        li.className = `task-item ${task.completed ? 'completed' : ''} ${priorityClass}`;
+        // Gestion des classes CSS simples pour les couleurs
+        const classePriorite = task.priority == 3 ? 'prio-high' : task.priority == 1 ? 'prio-low' : 'prio-med';
+        const estFinie = task.completed ? 'completed' : '';
+        
+        li.className = `task-item ${estFinie} ${classePriorite}`;
         li.setAttribute('data-id', task.id);
 
         li.innerHTML = `
             <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})">
             <div class="task-content">
-                <span class="category-badge ${categoryClass}">${task.category}</span>
-                <div class="task-info">
-                    <span class="task-text" ondblclick="window.editTask(${task.id})">${task.text}</span>
-                    ${dueDateHtml}
-                </div>
+                <span class="category-badge">${task.category}</span>
+                <span class="task-text">${task.text}</span>
             </div>
             <button onclick="deleteTask(${task.id})" class="delete-btn">🗑️</button>
         `;
-        list.appendChild(li);
+        listeUl.appendChild(li);
     });
 
-    updateStats();
-    updateDashboard();
+    updateDashboard(); // On met à jour les compteurs en même temps
 }
+
+// --- LES COMPTEURS ET STATISTIQUES ---
 
 function updateDashboard() {
     const tasks = store.state.tasks;
-    const fill = document.getElementById('progress-fill');
-    const text = document.getElementById('progress-text');
-    const urgentElement = document.getElementById('urgent-count');
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    const urgentCount = document.getElementById('urgent-count');
+    const remainingCount = document.getElementById('task-count');
 
-    if (!fill || !text || !urgentElement) return;
+    if (tasks.length === 0) return;
 
-    if (tasks.length === 0) {
-        fill.style.width = '0%';
-        text.innerText = '0% complété';
-        urgentElement.innerText = '0';
-        return;
-    }
+    // Calcul du pourcentage de progression
+    const terminees = tasks.filter(t => t.completed).length;
+    const pourcentage = Math.round((terminees / tasks.length) * 100);
+    
+    if(progressFill) progressFill.style.width = `${pourcentage}%`;
+    if(progressText) progressText.innerText = `${pourcentage}% complété`;
 
-    const completed = tasks.filter(t => t.completed).length;
-    const percent = Math.round((completed / tasks.length) * 100);
-    fill.style.width = `${percent}%`;
-    text.innerText = `${percent}% complété`;
+    // Calcul des urgences (Prio 3 et non finies)
+    const urgentes = tasks.filter(t => t.priority === "3" && !t.completed).length;
+    if(urgentCount) urgentCount.innerText = urgentes;
 
-    const urgents = tasks.filter(t => t.priority === 3 && !t.completed).length;
-    urgentElement.innerText = urgents;
+    // Tâches restantes
+    const restantes = tasks.filter(t => !t.completed).length;
+    if(remainingCount) remainingCount.innerText = restantes;
 }
 
-function updateStats() {
-    const countElement = document.getElementById('task-count');
-    if (countElement) {
-        const remaining = store.state.tasks.filter(t => !t.completed).length;
-        countElement.innerText = remaining;
-    }
-}
+// --- EVENEMENTS (Ce qui se passe quand on clique) ---
 
-// --- EVENEMENTS ---
 document.addEventListener('DOMContentLoaded', () => {
-    renderTasks();
+    
+    // Au clic sur le formulaire d'ajout
+    const form = document.getElementById('todo-form');
+    form.onsubmit = (e) => {
+        e.preventDefault();
+        const texte = document.getElementById('task-input').value;
+        const cat = document.getElementById('category-input').value;
+        const prio = document.getElementById('priority-input').value;
+        const date = document.getElementById('date-input').value;
 
-    const taskForm = document.getElementById('todo-form');
-    if (taskForm) {
-        taskForm.onsubmit = (e) => {
-            e.preventDefault();
-            const text = document.getElementById('task-input').value.trim();
-            const category = document.getElementById('category-input').value;
-            const priority = document.getElementById('priority-input').value;
-            const dueDate = document.getElementById('date-input').value;
+        if (texte.trim() !== "") {
+            store.addTask(texte, cat, prio, date);
+            form.reset();
+            renderTasks();
+        }
+    };
 
-            if (text) {
-                store.addTask(text, category, priority, dueDate);
-                if (priority === "3") sendUrgentNotification(text);
-                e.target.reset();
-                renderTasks();
-            }
-        };
-    }
-
+    // Gestion de la barre de recherche
     document.getElementById('search-input').oninput = (e) => {
-        currentSearch = e.target.value;
+        rechercheEnCours = e.target.value;
         renderTasks();
     };
 
-    document.querySelectorAll('.filter-btn').forEach(btn => {
+    // Gestion des boutons de FILTRE (CCNA, Stage, Perso)
+    const boutonsFiltre = document.querySelectorAll('.filter-btn');
+    boutonsFiltre.forEach(btn => {
         btn.onclick = () => {
-            const filter = btn.getAttribute('data-filter');
-            localStorage.setItem('activeFilter', filter);
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            // 1. On change le filtre actuel
+            filtreActuel = btn.getAttribute('data-filter');
+            localStorage.setItem('activeFilter', filtreActuel);
+
+            // 2. On change l'apparence des boutons
+            boutonsFiltre.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            renderTasks(filter);
+
+            // 3. On recharge la liste
+            renderTasks();
         };
     });
 
-    document.getElementById('enable-notifs').onclick = requestNotifPermission;
+    // Nettoyer les tâches terminées
     document.getElementById('clear-completed').onclick = () => {
         store.clearCompleted();
         renderTasks();
     };
-    const focusBtn = document.getElementById('focus-mode-btn');
-if (focusBtn) {
-    focusBtn.onclick = () => {
-        document.body.classList.toggle('focus-active');
-        
-        // On change le texte du bouton selon l'état
-        if (document.body.classList.contains('focus-active')) {
-            focusBtn.innerText = "✖ Quitter Focus";
-            // On s'assure qu'on voit bien le bouton pour quitter
-            document.getElementById('app').prepend(focusBtn); 
-        } else {
-            focusBtn.innerText = "🎯 Mode Focus";
-            // On le remet à sa place d'origine
-            document.querySelector('.header-flex').appendChild(focusBtn);
-            renderTasks();
-        }
-    };
-}
-});
 
-// --- UTILS ---
-function isOverdue(dateString) {
-    if (!dateString) return false;
-    return new Date(dateString).setHours(0,0,0,0) < new Date().setHours(0,0,0,0);
-}
-
-function formatDate(dateString) {
-    return new Date(dateString).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-}
-
-const requestNotifPermission = () => {
-    if ("Notification" in window) {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") new Notification("FlowOS", { body: "Alertes activées !" });
-        });
-    }
-};
-
-const sendUrgentNotification = (name) => {
-    if (Notification.permission === "granted") {
-        new Notification("🚨 Urgent", { body: `Tâche critique : ${name}` });
-    }
-};
-
-// --- EDITION ---
-window.editTask = (id) => {
-    const taskTextElement = document.querySelector(`li[data-id="${id}"] .task-text`);
-    if (!taskTextElement) return;
-    const currentText = taskTextElement.innerText;
-    taskTextElement.innerHTML = `<input type="text" class="edit-input" id="editing-${id}" value="${currentText}">`;
-    const input = document.getElementById(`editing-${id}`);
-    input.focus();
-    input.onblur = () => window.saveEdit(id, input.value);
-    input.onkeydown = (e) => { if (e.key === 'Enter') window.saveEdit(id, input.value); };
-};
-
-window.saveEdit = (id, newText) => {
-    const task = store.state.tasks.find(t => t.id === id);
-    if (task && newText.trim() !== "") {
-        task.text = newText;
-        store.save();
-    }
+    // Lancer le premier affichage
     renderTasks();
-};
+});
