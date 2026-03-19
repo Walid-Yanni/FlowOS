@@ -15,74 +15,99 @@
                 <h1>FlowOS</h1>
             </div>
             <ul class="nav-links">
-                <li><a href="#" class="active">Tâches</a></li>
-                <li><a href="#">Projets</a></li>
-            </ul>
+    <li><a href="#tasks" data-route="tasks" class="active">Tâches</a></li>
+    <li><a href="#projects" data-route="projects">Projets</a></li>
+    <li><a href="#notes" data-route="notes">Notes</a></li>
+    <li><a href="#analytics" data-route="analytics">Analytics</a></li>
+</ul>
             <div class="notif-panel">
-                <button id="enable-notifs">🔔 Activer Alertes</button>
+                <button id="enable-notifs">Activer Alertes</button>
             </div>
         </nav>
 
         <main id="app">
-            
-            <div class="dashboard-stats">
-                <div class="stat-card">
-                    <span class="stat-label">Progression</span>
-                    <div class="progress-bar-container">
-                        <div id="progress-fill" class="progress-fill"></div>
-                    </div>
-                    <span id="progress-text">0% complété</span>
+
+    <!-- VUE TÂCHES : tout ton contenu existant est ici -->
+    <div class="view" id="view-tasks">
+
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <span class="stat-label">Progression</span>
+                <div class="progress-bar-container">
+                    <div id="progress-fill" class="progress-fill"></div>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-label">Urgences 🔴</span>
-                    <span id="urgent-count" class="stat-value">0</span>
+                <span id="progress-text">0% complété</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Urgences</span>
+                <span id="urgent-count" class="stat-value">0</span>
+            </div>
+        </div>
+
+        <section id="tasks-section">
+            <div class="header-flex">
+                <h2>Mes Tâches</h2>
+                <button id="focus-mode-btn" class="btn-focus">Mode Focus</button>
+            </div>
+
+            <form id="todo-form">
+                <input type="text" id="task-input" placeholder="Ajouter une tâche..." required>
+                <select id="category-input">
+                    <option value="Général">Général</option>
+                    <option value="Stage">Stage</option>
+                    <option value="CCNA">CCNA</option>
+                    <option value="Perso">Perso</option>
+                </select>
+                <select id="priority-input">
+                    <option value="1">Basse</option>
+                    <option value="2" selected>Moyenne</option>
+                    <option value="3">Haute</option>
+                </select>
+                <input type="date" id="date-input">
+                <button type="submit" id="add-task-btn">+</button>
+            </form>
+
+            <div class="task-controls">
+                <div class="task-stats">
+                    <span>Il reste <span id="task-count">0</span> tâche(s).</span>
+                    <button id="clear-completed">Nettoyer terminées 🧹</button>
                 </div>
-            </div>  
-
-            <section id="tasks-section">
-                <div class="header-flex">
-                    <h2>Mes Tâches</h2>
-                    <button id="focus-mode-btn" class="btn-focus">🎯 Mode Focus</button>
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Rechercher une tâche...">
                 </div>
-                
-                <form id="todo-form">
-                    <input type="text" id="task-input" placeholder="Ajouter une tâche..." required>
-                    <select id="category-input">
-                        <option value="Général">⚙️ Général</option>
-                        <option value="Stage">🏢 Stage</option>
-                        <option value="CCNA">🌐 CCNA</option>
-                        <option value="Perso">🏠 Perso</option>
-                    </select>
-                    <select id="priority-input">
-                        <option value="1">🟢 Basse</option>
-                        <option value="2" selected>🟡 Moyenne</option>
-                        <option value="3">🔴 Haute</option>
-                    </select>
-                    <input type="date" id="date-input"> 
-                    <button type="submit" id="add-task-btn">+</button>
-                </form>
-
-                <div class="task-controls">
-                    <div class="task-stats">
-                        <span>Il reste <span id="task-count">0</span> tâche(s).</span>
-                        <button id="clear-completed">Nettoyer terminées 🧹</button>
-                    </div>
-
-                    <div class="search-container">
-                        <input type="text" id="search-input" placeholder="Rechercher une tâche...">
-                    </div>
-
-                    <div class="filters">
-                        <button class="filter-btn active" data-filter="all">Toutes</button>
-                        <button class="filter-btn" data-filter="CCNA">CCNA</button>
-                        <button class="filter-btn" data-filter="Stage">Stage</button>
-                        <button class="filter-btn" data-filter="Perso">Perso</button>
-                    </div>
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">Toutes</button>
+                    <button class="filter-btn" data-filter="CCNA">CCNA</button>
+                    <button class="filter-btn" data-filter="Stage">Stage</button>
+                    <button class="filter-btn" data-filter="Perso">Perso</button>
                 </div>
+            </div>
 
-                <ul id="task-list"></ul>
-            </section>
-        </main>
+            <ul id="task-list"></ul>
+        </section>
+
+    </div>
+    <!-- FIN VUE TÂCHES -->
+
+    <!-- VUE PROJETS (vide pour l'instant) -->
+    <div class="view" id="view-projects">
+        <h2>Projets</h2>
+        <p>Module projets — à venir</p>
+    </div>
+
+    <!-- VUE NOTES (vide pour l'instant) -->
+    <div class="view" id="view-notes">
+        <h2>Notes</h2>
+        <p>Module notes — à venir</p>
+    </div>
+
+    <!-- VUE ANALYTICS (vide pour l'instant) -->
+    <div class="view" id="view-analytics">
+        <h2>Analytics</h2>
+        <p>Module analytics — à venir</p>
+    </div>
+
+</main>
     </div>
 
     <script type="module" src="app/app.js"></script>

@@ -1,4 +1,5 @@
 import store from './store.js';
+import router from './router.js';
 
 // --- INITIALISATION ---
 store.init();
@@ -26,6 +27,16 @@ window.deleteTask = (id) => {
 // --- LE RENDU (Affichage sur l'écran) ---
 
 function renderTasks() {
+    // Gestion du Mode Focus
+const btnFocus = document.getElementById('focus-mode-btn');
+btnFocus.onclick = () => {
+    // On ajoute ou retire la classe "focus-active" sur le body
+    document.body.classList.toggle('focus-active');
+
+    // On change le texte du bouton selon l'état
+    const estActif = document.body.classList.contains('focus-active');
+    btnFocus.textContent = estActif ? ' Quitter Focus' : ' Mode Focus';
+};
     const listeUl = document.getElementById('task-list');
     if (!listeUl) return;
 
@@ -72,6 +83,7 @@ function renderTasks() {
     });
 
     updateDashboard(); // On met à jour les compteurs en même temps
+router.init();
 }
 
 // --- LES COMPTEURS ET STATISTIQUES ---
@@ -93,7 +105,7 @@ function updateDashboard() {
     if(progressText) progressText.innerText = `${pourcentage}% complété`;
 
     // Calcul des urgences (Prio 3 et non finies)
-    const urgentes = tasks.filter(t => t.priority === "3" && !t.completed).length;
+    const urgentes = tasks.filter(t => t.priority === 3 && !t.completed).length;
     if(urgentCount) urgentCount.innerText = urgentes;
 
     // Tâches restantes
@@ -153,3 +165,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Lancer le premier affichage
     renderTasks();
 });
+// Transformer la date "2026-03-14" en "14 mars"
+function formaterDate(chaineDate) {
+    if (!chaineDate) return "";
+    const options = { day: 'numeric', month: 'short' };
+    return new Date(chaineDate).toLocaleDateString('fr-FR', options);
+}
+
+// Vérifier si une tâche est en retard
+function estEnRetard(chaineDate) {
+    if (!chaineDate) return false;
+    const aujourdhui = new Date().setHours(0, 0, 0, 0);
+    const dateEcheance = new Date(chaineDate).setHours(0, 0, 0, 0);
+    return dateEcheance < aujourdhui;
+}
