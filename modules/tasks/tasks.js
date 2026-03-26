@@ -53,7 +53,7 @@ export function renderTasks(filtreActuel = 'all', rechercheEnCours = '') {
             <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})">
             <div class="task-content">
                 <span class="category-badge">${task.category}</span>
-                <span class="task-text">${task.text}</span>
+                <span class="task-text" ondblclick="editTask(${task.id}, this)">${task.text}</span>
             </div>
             <button onclick="deleteTask(${task.id})" class="delete-btn">🗑️</button>
         `;
@@ -61,6 +61,40 @@ export function renderTasks(filtreActuel = 'all', rechercheEnCours = '') {
     });
 
     updateDashboard();
+}
+// Modifier une tâche au double clic
+export function editTask(id, element) {
+    // On rend le texte modifiable
+    element.contentEditable = true;
+    element.focus();
+
+    // On sélectionne tout le texte pour faciliter la modification
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    // Quand on appuie sur Entrée, on sauvegarde
+    element.onkeydown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const nouveauTexte = element.innerText.trim();
+            if (nouveauTexte !== "") {
+                store.updateTask(id, nouveauTexte);
+            }
+            element.contentEditable = false;
+        }
+    };
+
+    // Quand on clique ailleurs, on sauvegarde aussi
+    element.onblur = () => {
+        const nouveauTexte = element.innerText.trim();
+        if (nouveauTexte !== "") {
+            store.updateTask(id, nouveauTexte);
+        }
+        element.contentEditable = false;
+    };
 }
 
 // Mettre à jour les stats du dashboard

@@ -54,7 +54,15 @@ const store = {
         // On ne garde que les tâches qui ne sont pas finies (completed === false)
         this.state.tasks = this.state.tasks.filter(t => t.completed === false);
         this.save();
+    },
+    // Modifier le texte d'une tâche
+ updateTask(id, nouveauTexte) {
+    const laTache = this.state.tasks.find(t => t.id === id);
+    if (laTache) {
+        laTache.text = nouveauTexte;
+        this.save();
     }
+   }
 };
 
 // On exporte le store pour l'utiliser dans app.js

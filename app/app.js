@@ -1,6 +1,6 @@
 import store from './store.js';
 import router from './router.js';
-import { renderTasks, updateDashboard, toggleTask, deleteTask } from '../modules/tasks/tasks.js';
+import { renderTasks, updateDashboard, toggleTask, deleteTask, editTask } from '../modules/tasks/tasks.js';
 
 // --- INITIALISATION ---
 store.init();
@@ -10,6 +10,7 @@ let filtreActuel = localStorage.getItem('activeFilter') || 'all';
 // On rend les fonctions accessibles depuis le HTML (les onclick)
 window.toggleTask = toggleTask;
 window.deleteTask = deleteTask;
+window.editTask = editTask;
 
 // --- EVENEMENTS ---
 document.addEventListener('DOMContentLoaded', () => {
