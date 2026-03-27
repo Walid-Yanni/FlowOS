@@ -4,28 +4,33 @@
 const store = {
     // 1. L'état actuel de nos données (notre tableau de tâches)
     state: {
-        tasks: []
+        tasks: [],
+        projects: []
     },
 
     // 2. Initialisation : On récupère ce qui est stocké dans le navigateur au démarrage
     init() {
-        const donneesSauvegardees = localStorage.getItem('flowos_tasks');
-        
-        if (donneesSauvegardees) {
-            // On transforme le texte JSON en véritable tableau JavaScript
-            this.state.tasks = JSON.parse(donneesSauvegardees);
-        } else {
-            // Si rien n'est stocké, on commence avec une liste vide
-            this.state.tasks = [];
-        }
-    },
+    const donneesSauvegardees = localStorage.getItem('flowos_tasks');
+    const projetsSauvegardes = localStorage.getItem('flowos_projects');
+
+    if (donneesSauvegardees) {
+        this.state.tasks = JSON.parse(donneesSauvegardees);
+    } else {
+        this.state.tasks = [];
+    }
+
+    if (projetsSauvegardes) {
+        this.state.projects = JSON.parse(projetsSauvegardes);
+    } else {
+        this.state.projects = [];
+    }
+},
 
     // 3. Sauvegarde : On enregistre le tableau actuel dans le navigateur
     save() {
-        // On transforme le tableau en texte (JSON) pour que le navigateur puisse le garder
-        const texteAEnregistrer = JSON.stringify(this.state.tasks);
-        localStorage.setItem('flowos_tasks', texteAEnregistrer);
-    },
+    localStorage.setItem('flowos_tasks', JSON.stringify(this.state.tasks));
+    localStorage.setItem('flowos_projects', JSON.stringify(this.state.projects));
+},
 
     // 4. Ajouter une tâche
     addTask(contenu, categorie, niveauPriorite, dateEcheance) {
@@ -62,7 +67,22 @@ const store = {
         laTache.text = nouveauTexte;
         this.save();
     }
-   }
+   },
+   // Ajouter un projet
+addProject(nom) {
+    const nouveauProjet = {
+        id: Date.now(),
+        name: nom
+    };
+    this.state.projects.push(nouveauProjet);
+    this.save();
+},
+
+// Supprimer un projet
+deleteProject(id) {
+    this.state.projects = this.state.projects.filter(p => p.id !== id);
+    this.save();
+}
 };
 
 // On exporte le store pour l'utiliser dans app.js

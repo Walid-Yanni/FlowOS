@@ -63,6 +63,9 @@
                     <option value="2" selected>Moyenne</option>
                     <option value="3">Haute</option>
                 </select>
+                <select id="project-input-task">
+    <option value="">Aucun projet</option>
+</select>
                 <input type="date" id="date-input">
                 <button type="submit" id="add-task-btn">+</button>
             </form>
@@ -91,9 +94,17 @@
 
     <!-- VUE PROJETS (vide pour l'instant) -->
     <div class="view" id="view-projects">
-        <h2>Projets</h2>
-        <p>Module projets — à venir</p>
-    </div>
+    <h2>Mes Projets</h2>
+
+    <!-- Formulaire pour ajouter un projet -->
+    <form id="project-form">
+        <input type="text" id="project-input" placeholder="Nom du projet..." required>
+        <button type="submit">+</button>
+    </form>
+
+    <!-- Liste des projets -->
+    <div id="projects-list"></div>
+</div>
 
     <!-- VUE NOTES (vide pour l'instant) -->
     <div class="view" id="view-notes">

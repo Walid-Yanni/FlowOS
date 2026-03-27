@@ -1,6 +1,7 @@
 import store from './store.js';
 import router from './router.js';
 import { renderTasks, updateDashboard, toggleTask, deleteTask, editTask } from '../modules/tasks/tasks.js';
+import { renderProjects, deleteProject } from '../modules/projects/projects.js';
 
 // --- INITIALISATION ---
 store.init();
@@ -11,6 +12,7 @@ let filtreActuel = localStorage.getItem('activeFilter') || 'all';
 window.toggleTask = toggleTask;
 window.deleteTask = deleteTask;
 window.editTask = editTask;
+window.deleteProject = deleteProject;
 
 // --- EVENEMENTS ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -68,4 +70,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Démarrage du router
     router.init();
+    // Gestion du formulaire de projet
+const projectForm = document.getElementById('project-form');
+if (projectForm) {
+    projectForm.onsubmit = (e) => {
+        e.preventDefault();
+        const nom = document.getElementById('project-input').value;
+        if (nom.trim() !== "") {
+            store.addProject(nom);
+            projectForm.reset();
+            renderProjects();
+        }
+    };
+}
+
+// Premier affichage des projets
+renderProjects();
 });
