@@ -48,6 +48,12 @@ const router = {
             module.renderTasks(filtreActuel, rechercheEnCours);
         });
     }
+    // Rafraîchir analytics si on est sur cette vue
+if (hash === 'analytics') {
+    import('../modules/analytics/analytics.js').then(module => {
+        module.renderAnalytics();
+    });
+}
 },
 
     // Démarrer le router
