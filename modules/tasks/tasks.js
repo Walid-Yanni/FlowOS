@@ -119,3 +119,19 @@ export function updateDashboard() {
     const restantes = tasks.filter(t => !t.completed).length;
     if (remainingCount) remainingCount.innerText = restantes;
 }
+// Remplir le menu déroulant des projets dans le formulaire des tâches
+export function renderProjectOptions() {
+    const select = document.getElementById('project-input-task');
+    if (!select) return;
+
+    // On garde uniquement l'option "Aucun projet"
+    select.innerHTML = '<option value="">Aucun projet</option>';
+
+    // On ajoute un projet par option
+    store.state.projects.forEach(projet => {
+        const option = document.createElement('option');
+        option.value = projet.id;
+        option.textContent = projet.name;
+        select.appendChild(option);
+    });
+}

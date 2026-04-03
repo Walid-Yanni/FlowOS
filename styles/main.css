@@ -179,3 +179,8 @@ body.focus-active .task-item:first-child {
     transform: scale(1.3);
     border: 2px solid var(--accent);
 }
+/* Cacher toutes les vues par défaut */
+.view {
+    display: none;
+}
+/* Cacher toutes les vues par défaut */
