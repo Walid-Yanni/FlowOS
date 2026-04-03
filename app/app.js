@@ -3,6 +3,9 @@ import router from './router.js';
 import { renderTasks, updateDashboard, toggleTask, deleteTask, editTask, renderProjectOptions } from '../modules/tasks/tasks.js';
 import { renderProjects, deleteProject } from '../modules/projects/projects.js';
 import { renderNotes, deleteNote, editNote, editNoteContent } from '../modules/notes/notes.js';
+import { renderAnalytics } from '../modules/analytics/analytics.js';
+
+
 // --- INITIALISATION ---
 store.init();
 let rechercheEnCours = "";
@@ -102,6 +105,49 @@ if (noteForm) {
 
 // Premier affichage des notes
 renderNotes();
+// Premier affichage analytics
+renderAnalytics();
+// Gestion du dark mode
+const themeBtn = document.getElementById('theme-btn');
+const themeSauvegarde = localStorage.getItem('theme') || 'dark';
+
+// On applique le thème sauvegardé au démarrage
+if (themeSauvegarde === 'light') {
+    document.body.classList.add('light-mode');
+    themeBtn.textContent = '🌙 Mode Sombre';
+}
+
+// Au clic on bascule
+themeBtn.onclick = () => {
+    document.body.classList.toggle('light-mode');
+    const estClair = document.body.classList.contains('light-mode');
+    themeBtn.textContent = estClair ? '🌙 Mode Sombre' : '☀️ Mode Clair';
+    localStorage.setItem('theme', estClair ? 'light' : 'dark');
+};
+// Export JSON
+document.getElementById('export-btn').onclick = () => {
+    const donnees = {
+        tasks: store.state.tasks,
+        projects: store.state.projects,
+        notes: store.state.notes,
+        exportDate: new Date().toLocaleDateString('fr-FR')
+    };
+
+    // On convertit en texte JSON lisible
+    const json = JSON.stringify(donnees, null, 2);
+
+    // On crée un fichier téléchargeable
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    // On déclenche le téléchargement
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'flowos-export.json';
+    a.click();
+
+    URL.revokeObjectURL(url);
+};
     // Démarrage du router
     router.init();
 

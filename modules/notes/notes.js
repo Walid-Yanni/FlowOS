@@ -47,18 +47,23 @@ export function editNote(id, element) {
     element.focus();
     element.onblur = () => {
         const nouveau = element.innerText.trim();
-        if (nouveau !== '') store.updateNote(id, nouveau, null);
+        if (nouveau !== '') {
+            store.updateNote(id, nouveau, null);
+        }
         element.contentEditable = false;
+        renderNotes(); // On rafraîchit après modification
     };
 }
 
-// Modifier le contenu d'une note
 export function editNoteContent(id, element) {
     element.contentEditable = true;
     element.focus();
     element.onblur = () => {
         const nouveau = element.innerText.trim();
-        if (nouveau !== '') store.updateNote(id, null, nouveau);
+        if (nouveau !== '') {
+            store.updateNote(id, null, nouveau);
+        }
         element.contentEditable = false;
+        renderNotes(); // On rafraîchit après modification
     };
 }

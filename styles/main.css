@@ -184,3 +184,22 @@ body.focus-active .task-item:first-child {
     display: none;
 }
 /* Cacher toutes les vues par défaut */
+/* --- THEME CLAIR --- */
+body.light-mode {
+    --bg-dark: #f1f5f9;
+    --sidebar-bg: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --accent: #0284c7;
+}
+
+body.light-mode .task-item {
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+body.light-mode #search-input,
+body.light-mode .filter-btn {
+    background: #ffffff;
+    color: #0f172a;
+}
