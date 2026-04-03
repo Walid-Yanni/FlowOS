@@ -108,9 +108,16 @@
 
     <!-- VUE NOTES (vide pour l'instant) -->
     <div class="view" id="view-notes">
-        <h2>Notes</h2>
-        <p>Module notes — à venir</p>
-    </div>
+    <h2>Mes Notes</h2>
+
+    <form id="note-form">
+        <input type="text" id="note-title-input" placeholder="Titre de la note..." required>
+        <textarea id="note-content-input" placeholder="Contenu de la note..."></textarea>
+        <button type="submit">+</button>
+    </form>
+
+    <div id="notes-list"></div>
+</div>
 
     <!-- VUE ANALYTICS (vide pour l'instant) -->
     <div class="view" id="view-analytics">

@@ -2,7 +2,7 @@ import store from './store.js';
 import router from './router.js';
 import { renderTasks, updateDashboard, toggleTask, deleteTask, editTask, renderProjectOptions } from '../modules/tasks/tasks.js';
 import { renderProjects, deleteProject } from '../modules/projects/projects.js';
-
+import { renderNotes, deleteNote, editNote, editNoteContent } from '../modules/notes/notes.js';
 // --- INITIALISATION ---
 store.init();
 let rechercheEnCours = "";
@@ -85,9 +85,26 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTasks(filtreActuel, rechercheEnCours);
     renderProjects();
     renderProjectOptions();
+// Gestion du formulaire de notes
+const noteForm = document.getElementById('note-form');
+if (noteForm) {
+    noteForm.onsubmit = (e) => {
+        e.preventDefault();
+        const titre = document.getElementById('note-title-input').value;
+        const contenu = document.getElementById('note-content-input').value;
+        if (titre.trim() !== '') {
+            store.addNote(titre, contenu);
+            noteForm.reset();
+            renderNotes();
+        }
+    };
+}
 
+// Premier affichage des notes
+renderNotes();
     // Démarrage du router
     router.init();
+
 });
 window.filtrerParProjet = (projetId, projetNom) => {
     // On navigue vers la vue tâches
@@ -125,3 +142,6 @@ window.filtrerParProjet = (projetId, projetNom) => {
         document.querySelector('#tasks-section h2').textContent = `Tâches — ${projetNom}`;
     }, 100);
 };
+window.deleteNote = deleteNote;
+window.editNote = editNote;
+window.editNoteContent = editNoteContent;
