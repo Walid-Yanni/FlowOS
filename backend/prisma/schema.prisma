@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL")
+}
+
+// --- NOS TABLES (MODÈLES) ---
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  text        String
+  category    String    @default("Général")
+  priority    Int       @default(2)
+  dueDate     DateTime? // Le "?" signifie que la date n'est pas obligatoire
+  projectId   Int?      // L'ID du projet associé (optionnel)
+  completed   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+}
+
+model Project {
+  id          Int       @id @default(autoincrement())
+  name        String
+  createdAt   DateTime  @default(now())
+}
+
+model Note {
+  id          Int       @id @default(autoincrement())
+  title       String
+  content     String?   @db.Text
+  createdAt   DateTime  @default(now())
+}
